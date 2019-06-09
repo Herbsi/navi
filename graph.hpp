@@ -1,6 +1,14 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#define DEBUG 0
+
+#if DEBUG == 1
+#define LOG(x) std::cerr << x << std::endl;
+#else
+#define LOG(x)
+#endif
+
 #include "node.hpp"
 #include <algorithm>
 #include <cassert>
