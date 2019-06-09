@@ -7,6 +7,7 @@
 #include <vector>
 
 class Node;
+class DistanceResult;
 
 using NodePtr = std::shared_ptr<Node>;
 
@@ -36,6 +37,9 @@ public:
   double getX() const { return _x; }
   double getY() const { return _y; }
 
+  Node &addNeighbour(const NodePtr other);
+  DistanceResult getDistancetoNeighbour(const NodePtr other);
+
 protected:
 private:
   double _x;
@@ -45,4 +49,18 @@ private:
 };
 
 double calculateDistanceBetweenNodes(const NodePtr a, const NodePtr b);
+
+class DistanceResult {
+public:
+  //! Default constructor
+  DistanceResult();
+
+  DistanceResult(const bool validResult, const double result)
+      : valid(validResult), distance(result) {}
+  virtual ~DistanceResult();
+
+  bool valid;
+  bool distance;
+};
+
 #endif /* NODE_HPP */

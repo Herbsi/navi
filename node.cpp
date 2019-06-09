@@ -19,7 +19,8 @@ Node::Node(const double x, const double y,
 
   // cache distances to neighbours
   for (auto &n : _neighbours) {
-    double dist = euclid(_x, n->getX(), _y, n->getY());
+    double dist =
+        calculateDistanceBetweenNodes(std::make_shared<Node>(*this), n);
     _cachedDistancesToNeighbours.insert(std::make_pair(n, dist));
   }
 }
@@ -37,6 +38,23 @@ Node &Node::operator=(const Node &other) {
   _neighbours = other._neighbours;
 
   return *this;
+}
+
+Node &Node::addNeighbour(const NodePtr other) {
+  _neighbours.push_back(other);
+  double dist =
+      calculateDistanceBetweenNodes(std::make_shared<Node>(*this), other);
+  _cachedDistancesToNeighbours.insert(std::make_pair(other, dist));
+  return *this;
+}
+
+DistanceResult Node::getDistancetoNeighbour(const NodePtr other) {
+  auto search = _cachedDistancesToNeighbours.find(other);
+  if (search != _cachedDistancesToNeighbours.end()) {
+    return DistanceResult(true, std::get<1>(*search));
+  } else {
+    return DistanceResult(false, -1);
+  }
 }
 
 double calculateDistanceBetweenNodes(const NodePtr a, const NodePtr b) {
