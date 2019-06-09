@@ -3,26 +3,26 @@
 
 #include <cmath>
 #include <map>
+#include <memory>
 #include <vector>
 
-class Edge;
+class Node;
+
+using NodePtr = std::shared_ptr<Node>;
 
 class Node {
-
-  friend class Edge;
 
 public:
   //! Default constructor
   Node();
 
-  Node(const double x, const double y, const std::vector<Node *> neighbours,
-       const std::map<Node *, Edge *> neighbour_edge_dict);
+  Node(const double x, const double y, const std::vector<NodePtr> neighbours);
 
   //! Copy constructor
-  Node(const Node &other);
+  Node(const Node &other) = delete;
 
   //! Move constructor
-  Node(Node &&other) noexcept;
+  Node(Node &&other) noexcept = delete;
 
   //! Destructor
   virtual ~Node() noexcept;
@@ -40,43 +40,9 @@ protected:
 private:
   double _x;
   double _y;
-  std::vector<Node *> _neighbours;
-  std::map<Node *, Edge *> _neighbour_edge_dict;
+  std::vector<NodePtr> _neighbours;
+  std::map<NodePtr, double> _cachedDistancesToNeighbours;
 };
 
-class Edge {
-
-public:
-  //! Default constructor
-  Edge();
-
-  Edge(const Node *a, const Node *b);
-
-  //! Copy constructor
-  Edge(const Edge &other);
-
-  //! Move constructor
-  Edge(Edge &&other) noexcept;
-
-  //! Destructor
-  virtual ~Edge() noexcept;
-
-  //! Copy assignment operator
-  Edge &operator=(const Edge &other);
-
-  //! Move assignment operator
-  Edge &operator=(Edge &&other) noexcept;
-
-  double getLength() const { return _length; }
-  Node *getPointA() const { return _a; }
-  Node *getPointB() const { return _b; }
-
-protected:
-private:
-  Node *_a;
-  Node *_b;
-  double _length;
-  Edge _calculateLength();
-};
-
+double calculateDistanceBetweenNodes(const NodePtr a, const NodePtr b);
 #endif /* NODE_HPP */
