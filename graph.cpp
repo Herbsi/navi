@@ -84,8 +84,8 @@ Graph &Graph::operator=(const Graph &rhs) {
     return *this;
   for (auto &pair : rhs._nodes) {
     // deep copy Node
-    NodePtr n = std::make_shared<Node>(*(std::get<1>(pair)));
-    _nodes.insert(std::make_pair(std::get<0>(pair), n));
+    NodePtr n = std::make_shared<Node>(*(pair.second));
+    _nodes.insert(std::make_pair(pair.first, n));
   }
 
   return *this;
