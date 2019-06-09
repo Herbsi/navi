@@ -115,4 +115,62 @@ double Graph::pathLength(const std::vector<NodeIndex> &path) {
   return pathLengthResult.distance;
 }
 
-std::vector<NodeIndex> navi(const NodeIndex i, const NodeIndex j) {}
+std::vector<NodeIndex> Graph::navi(const NodeIndex i, const NodeIndex j) {
+  // Initialisierung
+  std::map<NodeIndex, Distance> distances;
+  std::map<NodeIndex, std::pair<NodeIndex, NodePtr>> predecessors;
+  std::map<NodeIndex, bool> visited;
+  for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
+    NodeIndex idx = it->first;
+    NodePtr currentNode = it->second;
+    if (idx != i) {
+      distances.emplace(std::make_pair(idx, Distance(0.0, true)));
+    } else {
+      distances.emplace(std::make_pair(i, Distance(0.0, false)));
+    }
+    predecessors.emplace(idx, std::make_pair(0, nullptr));
+    visited.emplace(idx, false);
+  }
+  // Initialisierung abgeschlossen
+
+  // while not all nodes have been visited
+  while (!std::all_of(
+      visited.cbegin(), visited.cend(),
+      [](const std::pair<NodeIndex, bool> &v) { return v.second; })) {
+    auto u = std::min(distances.begin(), distances.end(), [](auto &a, auto &b) {
+      return a->second < b->second;
+    }); // use < Operator for Distance class
+
+    // assert(!u.isInf, "No u with distance less than inf found!");
+
+    // Dijkstra Algorithm main part
+    NodeIndex u_idx = u->first;
+    visited.at(u_idx) = true;
+    for (auto v = _neighbours.at(u_idx).begin();
+         v != _neighbours.at(u_idx).end(); ++v) {
+      if (!visited.at(*v)) {
+        // distance of u to start is valid because it's the minimum
+        Distance alternative = distances.at(u_idx) + edgeLength(u_idx, *v);
+        if (alternative < distances.at(*v)) {
+
+          distances.at(*v) = alternative;
+          predecessors.at(*v) = std::make_pair(u_idx, _nodes.at(u_idx));
+        }
+      }
+    }
+  }
+  // Dijkstra is done
+
+  // Build the path
+  std::vector<NodeIndex> path = {j};
+  auto u = predecessors.at(j);
+  while (predecessors.at(u.first).second != nullptr) {
+    u = predecessors.at(u.first);
+    path.push_back(u.first);
+  }
+  // Path building done
+
+  std::reverse(std::begin(path), std::end(path));
+
+  return path;
+}

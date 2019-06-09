@@ -2,6 +2,8 @@
 #define GRAPH_H
 
 #include "node.hpp"
+#include <algorithm>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -32,6 +34,8 @@ public:
   //! Move assignment operator
   Graph &operator=(Graph &&other) noexcept;
 
+  std::map<NodeIndex, NodePtr> nodes() const { return _nodes; }
+
   double edgeLength(const NodeIndex i, const NodeIndex j);
 
   double pathLength(const std::vector<NodeIndex> &path);
@@ -41,13 +45,8 @@ public:
 protected:
 private:
   std::map<NodeIndex, NodePtr> _nodes;
+  std::map<NodeIndex, std::vector<NodeIndex>> _neighbours;
   DistanceResult _edgeLength(const NodeIndex i, const NodeIndex j);
 };
-
-class DijkstraNode {
-public:
-  double distance;
-  NodePtr predecessor;
-}
 
 #endif // GRAPH_H
