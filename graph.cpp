@@ -1,4 +1,52 @@
 #include "graph.hpp"
+///////////////////////////////////////////////////////////////////////////////
+//                                  DISTANCE                                 //
+///////////////////////////////////////////////////////////////////////////////
+class Distance {
+public:
+  //! Default Constructor
+  Distance() : Distance(0, false) {}
+
+  Distance(const double d) : Distance(d, false) {}
+
+  Distance(const double d, const bool b) : distance(d), isInf(b) {}
+
+  //! Destructor
+  virtual ~Distance() noexcept {}
+
+  double distance;
+  bool isInf;
+};
+
+bool operator<(const Distance &a, const Distance &b);
+bool operator<(const Distance &a, const Distance &b) {
+  bool res = true;
+  if (!a.isInf && !b.isInf) {
+    res = a < b;
+  } else if (!a.isInf && b.isInf) {
+    res = true;
+  } else if (a.isInf && !b.isInf) {
+    res = false;
+  } else {
+    res = false; // inf is not less than inf
+  }
+  return res;
+}
+
+Distance operator+(const Distance &lhs, const Distance &rhs);
+Distance operator+(const Distance &lhs, const Distance &rhs) {
+  Distance result;
+  if (lhs.isInf || rhs.isInf) {
+    result = {0.0, true};
+  } else {
+    result = {lhs.distance + rhs.distance, false};
+  }
+  return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//                                   GRAPH                                    //
+///////////////////////////////////////////////////////////////////////////////
 
 Graph::Graph() : _nodes({{}}) {}
 
