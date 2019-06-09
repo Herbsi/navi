@@ -17,10 +17,11 @@ public:
   //! Default constructor
   Node();
 
+  Node(const double x, const double y);
   Node(const double x, const double y, const std::vector<NodePtr> neighbours);
 
   //! Copy constructor
-  Node(const Node &other) = delete;
+  Node(const Node &other);
 
   //! Move constructor
   Node(Node &&other) noexcept = delete;
@@ -36,6 +37,7 @@ public:
 
   double getX() const { return _x; }
   double getY() const { return _y; }
+  std::vector<NodePtr> neighbours() const { return _neighbours; }
 
   Node &addNeighbour(const NodePtr other);
   DistanceResult getDistancetoNeighbour(const NodePtr other);
@@ -57,10 +59,11 @@ public:
 
   DistanceResult(const bool validResult, const double result)
       : valid(validResult), distance(result) {}
-  virtual ~DistanceResult();
+
+  virtual ~DistanceResult() noexcept {}
 
   bool valid;
-  bool distance;
+  double distance;
 };
 
 #endif /* NODE_HPP */

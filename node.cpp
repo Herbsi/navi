@@ -1,6 +1,8 @@
 #include "node.hpp"
 
 double euclid(const double x1, const double y1, const double x2,
+              const double y2);
+double euclid(const double x1, const double y1, const double x2,
               const double y2) {
   double x = x1 - x2;
   double y = y1 - y2;
@@ -13,6 +15,8 @@ double euclid(const double x1, const double y1, const double x2,
 
 Node::Node() : Node(0, 0, {}) {}
 
+Node::Node(const double x, const double y) : Node(x, y, {}) {}
+
 Node::Node(const double x, const double y,
            const std::vector<NodePtr> neighbours)
     : _x(x), _y(y), _neighbours(neighbours) {
@@ -24,6 +28,10 @@ Node::Node(const double x, const double y,
     _cachedDistancesToNeighbours.insert(std::make_pair(n, dist));
   }
 }
+
+Node::Node(const Node &other)
+    : _x(other._x), _y(other._y), _neighbours(other._neighbours),
+      _cachedDistancesToNeighbours(other._cachedDistancesToNeighbours) {}
 
 Node::~Node() noexcept {}
 
@@ -51,7 +59,7 @@ Node &Node::addNeighbour(const NodePtr other) {
 DistanceResult Node::getDistancetoNeighbour(const NodePtr other) {
   auto search = _cachedDistancesToNeighbours.find(other);
   if (search != _cachedDistancesToNeighbours.end()) {
-    return DistanceResult(true, std::get<1>(*search));
+    return DistanceResult(true, search->second);
   } else {
     return DistanceResult(false, -1);
   }
