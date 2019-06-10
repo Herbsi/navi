@@ -9,6 +9,17 @@ double euclid(const double x1, const double y1, const double x2,
   return sqrt(x * x + y * y);
 }
 
+double norm(const double x1, const double y1);
+double norm(const double x1, const double y1) { return euclid(x1, y1, 0, 0); }
+
+Angle angle(const NodePtr a, const NodePtr b, const NodePtr c) {
+  double x1 = c->getX() - b->getX();
+  double y1 = c->getY() - b->getY();
+  double x2 = a->getX() - b->getX();
+  double y2 = a->getY() - b->getY();
+  return acos((x1 * x2 + y1 * y1) / norm(x1, y1) * norm(x2, y2));
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                                    CONSTRUCTORS //
 ///////////////////////////////////////////////////////////////////////////////

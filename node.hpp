@@ -10,6 +10,7 @@ class Node;
 class DistanceResult;
 
 using NodePtr = std::shared_ptr<Node>;
+using Angle = double;
 
 class Node {
 
@@ -65,5 +66,7 @@ public:
   bool valid;
   double distance;
 };
+
+Angle angle(const NodePtr a, const NodePtr b, const NodePtr c);
 
 #endif /* NODE_HPP */

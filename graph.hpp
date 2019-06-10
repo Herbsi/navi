@@ -1,7 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#define DEBUG 0
+#define DEBUG 1
 
 #if DEBUG == 1
 #define LOG(x) std::cerr << x << std::endl;
@@ -20,6 +20,7 @@
 
 using NodeIndex = unsigned int;
 using IndexedNode = std::pair<NodeIndex, NodePtr>;
+using NodeWithAngle = std::pair<NodeIndex, Angle>;
 class Distance;
 struct DNodeContainer;
 
@@ -52,6 +53,8 @@ public:
   double pathLength(const std::vector<NodeIndex> &path);
 
   std::vector<NodeIndex> navi(const NodeIndex i, const NodeIndex j);
+  std::vector<NodeWithAngle> naviWithAngle(const NodeIndex i,
+                                           const NodeIndex j);
 
 protected:
 private:
