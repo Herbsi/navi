@@ -1,51 +1,4 @@
 #include "graph.hpp"
-///////////////////////////////////////////////////////////////////////////////
-//                                  DISTANCE                                 //
-///////////////////////////////////////////////////////////////////////////////
-class Distance {
-public:
-  //! Default Constructor
-  Distance() : Distance(0, false) {}
-
-  Distance(const double d) : Distance(d, false) {}
-
-  Distance(const double d, const bool b) : distance(d), isInf(b) {}
-
-  //! Destructor
-  virtual ~Distance() noexcept {}
-
-  double distance;
-  bool isInf;
-};
-
-bool operator<(const Distance &a, const Distance &b);
-bool operator<(const Distance &a, const Distance &b) {
-  bool res = true;
-  if (!a.isInf && !b.isInf) {
-    LOG(a.distance);
-    LOG(b.distance);
-    LOG("");
-    res = a.distance < b.distance;
-  } else if (!a.isInf && b.isInf) {
-    res = true;
-  } else if (a.isInf && !b.isInf) {
-    res = false;
-  } else {
-    res = false; // inf is not less than inf
-  }
-  return res;
-}
-
-Distance operator+(const Distance &lhs, const Distance &rhs);
-Distance operator+(const Distance &lhs, const Distance &rhs) {
-  Distance result;
-  if (lhs.isInf || rhs.isInf) {
-    result = {0.0, true};
-  } else {
-    result = {lhs.distance + rhs.distance, false};
-  }
-  return result;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                   GRAPH                                    //
@@ -120,62 +73,69 @@ double Graph::pathLength(const std::vector<NodeIndex> &path) {
 }
 
 std::vector<NodeIndex> Graph::navi(const NodeIndex i, const NodeIndex j) {
-  // Initialisierung
+
+  DNodeContainer dnc = _initialise(i);
+  _dijkstra(dnc);
+  return _builtPath(j, dnc.predecessors);
+}
+
+DNodeContainer Graph::_initialise(const NodeIndex i) {
   std::map<NodeIndex, Distance> distances;
-  std::map<NodeIndex, std::pair<NodeIndex, NodePtr>> predecessors;
+  std::map<NodeIndex, IndexedNode> predecessors;
   std::map<NodeIndex, bool> visited;
+
   for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
     NodeIndex idx = it->first;
     NodePtr currentNode = it->second;
-    if (idx != i) {
-      distances.emplace(std::make_pair(idx, Distance(0.0, true)));
-    } else {
-      distances.emplace(std::make_pair(i, Distance(0.0, false)));
-    }
+    distances.emplace(std::make_pair(idx, Distance(0.0, true)));
     predecessors.emplace(idx, std::make_pair(0, nullptr));
     visited.emplace(idx, false);
+    if (idx == i)
+      distances.at(idx).isInf = false;
   }
-  // Initialisierung abgeschlossen
 
-  // Dijkstra Algorithm main part
-  // while not all nodes have been visited
-  while (!std::all_of(visited.begin(), visited.end(),
+  return {distances, predecessors, visited};
+}
+
+Graph &Graph::_dijkstra(DNodeContainer &dnc) {
+
+  while (!std::all_of(dnc.visited.begin(), dnc.visited.end(),
                       [](auto &v) { return v.second; })) {
 
     LOG("Start of while ");
 #if DEBUG == 1
-    std::for_each(std::begin(distances), std::end(distances), [](auto &a) {
-      std::cerr << a.first << " " << a.second.distance << " " << a.second.isInf
-                << "\n";
-    });
+    std::for_each(std::begin(dnc.distances), std::end(dnc.distances),
+                  [](auto &a) {
+                    std::cerr << a.first << " " << a.second.distance << " "
+                              << a.second.isInf << "\n";
+                  });
 #endif
 
     LOG("Finding minimum");
-    auto u = std::min_element(distances.begin(), distances.end(),
+    auto u = std::min_element(dnc.distances.begin(), dnc.distances.end(),
                               [](const auto &a, const auto &b) {
                                 return a.second < b.second;
                               }); // use < Operator for Distance class
     LOG("Found minimum ");
     LOG(u->first);
-    // TODO fails at first split
-
-    if (u != distances.end()) {
+    if (u != dnc.distances.end()) {
       NodeIndex u_idx = u->first;
-      visited.at(u_idx) = true;
+      dnc.visited.at(u_idx) = true;
       for (auto v = _neighbours.at(u_idx).cbegin();
            v != _neighbours.at(u_idx).cend(); ++v) {
-        if (!visited.at(*v)) {
+        if (!dnc.visited.at(*v)) {
           // distance of u to start is valid because
           // it's the minimum
-          Distance alternative = distances.at(u_idx) + edgeLength(u_idx, *v);
-          if (alternative < distances.at(*v)) {
+          Distance alternative =
+              dnc.distances.at(u_idx) + edgeLength(u_idx, *v);
+          if (alternative < dnc.distances.at(*v)) {
 
-            distances.at(*v) = alternative;
-            predecessors.at(*v) = std::make_pair(u_idx, _nodes.at(u_idx));
+            dnc.distances.at(*v) = alternative;
+            dnc.predecessors.at(*v) = std::make_pair(u_idx, _nodes.at(u_idx));
           }
         }
       }
-      distances.erase(u);
+      dnc.distances.erase(u);
       LOG("End of for");
     } else
       std::cerr << "Invalid minimum\n";
@@ -184,18 +144,54 @@ std::vector<NodeIndex> Graph::navi(const NodeIndex i, const NodeIndex j) {
   LOG("Finished Dijkstra");
   // Dijkstra is done
 
-  // Build the path
-  std::vector<NodeIndex> path = {j};
-  auto u = predecessors.at(j);
+  return *this;
+}
+
+std::vector<NodeIndex>
+Graph::_builtPath(const NodeIndex endpoint,
+                  const std::map<NodeIndex, IndexedNode> &predecessors) {
+
+  std::vector<NodeIndex> path = {endpoint};
+  auto u = predecessors.at(endpoint);
   path.push_back(u.first);
   while (predecessors.at(u.first).second != nullptr) {
     u = predecessors.at(u.first);
     path.push_back(u.first);
   }
-  // Path building done
 
   std::reverse(std::begin(path), std::end(path));
   LOG("Built path");
 
   return path;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//                                  Distance                                 //
+///////////////////////////////////////////////////////////////////////////////
+
+bool operator<(const Distance &a, const Distance &b) {
+  bool res = true;
+  if (!a.isInf && !b.isInf) {
+    LOG(a.distance);
+    LOG(b.distance);
+    LOG("");
+    res = a.distance < b.distance;
+  } else if (!a.isInf && b.isInf) {
+    res = true;
+  } else if (a.isInf && !b.isInf) {
+    res = false;
+  } else {
+    res = false; // inf is not less than inf
+  }
+  return res;
+}
+
+Distance operator+(const Distance &lhs, const Distance &rhs) {
+  Distance result;
+  if (lhs.isInf || rhs.isInf) {
+    result = {0.0, true};
+  } else {
+    result = {lhs.distance + rhs.distance, false};
+  }
+  return result;
 }

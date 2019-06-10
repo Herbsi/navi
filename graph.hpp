@@ -19,6 +19,9 @@
 #include <vector>
 
 using NodeIndex = unsigned int;
+using IndexedNode = std::pair<NodeIndex, NodePtr>;
+class Distance;
+struct DNodeContainer;
 
 class Graph {
 public:
@@ -55,6 +58,44 @@ private:
   std::map<NodeIndex, NodePtr> _nodes;
   std::map<NodeIndex, std::vector<NodeIndex>> _neighbours;
   DistanceResult _edgeLength(const NodeIndex i, const NodeIndex j);
+  DNodeContainer _initialise(const NodeIndex i);
+  Graph &_dijkstra(DNodeContainer &dnc);
+  std::vector<NodeIndex>
+  _builtPath(const NodeIndex endpoint,
+             const std::map<NodeIndex, IndexedNode> &predecessor);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//                                  DISTANCE                                 //
+///////////////////////////////////////////////////////////////////////////////
+class Distance {
+public:
+  //! Default Constructor
+  Distance() : Distance(0, false) {}
+
+  Distance(const double d) : Distance(d, false) {}
+
+  Distance(const double d, const bool b) : distance(d), isInf(b) {}
+
+  //! Destructor
+  virtual ~Distance() noexcept {}
+
+  double distance;
+  bool isInf;
+};
+
+bool operator<(const Distance &a, const Distance &b);
+Distance operator+(const Distance &lhs, const Distance &rhs);
+
+///////////////////////////////////////////////////////////////////////////////
+//                                   DNodeContainer                          //
+///////////////////////////////////////////////////////////////////////////////
+
+struct DNodeContainer {
+
+  std::map<NodeIndex, Distance> distances;
+  std::map<NodeIndex, IndexedNode> predecessors;
+  std::map<NodeIndex, bool> visited;
 };
 
 #endif // GRAPH_H
