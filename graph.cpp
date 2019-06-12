@@ -82,18 +82,7 @@ std::vector<NodeIndex> Graph::navi(const NodeIndex i, const NodeIndex j) {
 std::vector<NodeWithAngle> Graph::naviWithAngle(const NodeIndex i,
                                                 const NodeIndex j) {
   auto path = navi(i, j);
-  std::vector<NodeWithAngle> pathWithAngle;
-  pathWithAngle.reserve(path.size());
-  pathWithAngle.emplace_back(*path.begin(), Angle(0.0, true));
-  for (auto it = path.begin() + 1; it != path.end() - 1; ++it) {
-    auto prevNode = _nodes.at(*(it - 1));
-    auto currentNode = _nodes.at(*it);
-    auto nextNode = _nodes.at(*(it + 1));
-    LOGNode(*it);
-    pathWithAngle.emplace_back(*it, angle(prevNode, currentNode, nextNode));
-  }
-  pathWithAngle.emplace_back(*path.end(), Angle(0.0, true));
-  return pathWithAngle;
+  return _builtPathWithAngle(path);
 }
 
 DNodeContainer Graph::_initialise(const NodeIndex i) {
@@ -182,6 +171,22 @@ Graph::_builtPath(const NodeIndex endpoint,
   return path;
 }
 
+std::vector<NodeWithAngle>
+Graph::_builtPathWithAngle(const std::vector<NodeIndex> &path) {
+
+  std::vector<NodeWithAngle> pathWithAngle;
+  pathWithAngle.reserve(path.size());
+  pathWithAngle.emplace_back(*path.begin(), Angle(0.0, true));
+  for (auto it = path.begin() + 1; it != path.end() - 1; ++it) {
+    auto prevNode = _nodes.at(*(it - 1));
+    auto currentNode = _nodes.at(*it);
+    auto nextNode = _nodes.at(*(it + 1));
+    LOGNode(*it);
+    pathWithAngle.emplace_back(*it, angle(prevNode, currentNode, nextNode));
+  }
+  pathWithAngle.emplace_back(*path.end(), Angle(0.0, true));
+  return pathWithAngle;
+}
 ///////////////////////////////////////////////////////////////////////////////
 //                                  Distance                                 //
 ///////////////////////////////////////////////////////////////////////////////

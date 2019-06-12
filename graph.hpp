@@ -66,6 +66,8 @@ private:
   std::vector<NodeIndex>
   _builtPath(const NodeIndex endpoint,
              const std::map<NodeIndex, IndexedNode> &predecessor);
+  std::vector<NodeWithAngle>
+  _builtPathWithAngle(const std::vector<NodeIndex> &path);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
