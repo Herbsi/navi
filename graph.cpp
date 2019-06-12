@@ -84,14 +84,15 @@ std::vector<NodeWithAngle> Graph::naviWithAngle(const NodeIndex i,
   auto path = navi(i, j);
   std::vector<NodeWithAngle> pathWithAngle;
   pathWithAngle.reserve(path.size());
-  pathWithAngle.emplace_back(*path.begin(), 0.0);
+  pathWithAngle.emplace_back(*path.begin(), Angle(0.0, true));
   for (auto it = path.begin() + 1; it != path.end() - 1; ++it) {
     auto prevNode = _nodes.at(*(it - 1));
     auto currentNode = _nodes.at(*it);
     auto nextNode = _nodes.at(*(it + 1));
+    LOGNode(*it);
     pathWithAngle.emplace_back(*it, angle(prevNode, currentNode, nextNode));
   }
-  pathWithAngle.emplace_back(*path.end(), 0.0);
+  pathWithAngle.emplace_back(*path.end(), Angle(0.0, true));
   return pathWithAngle;
 }
 

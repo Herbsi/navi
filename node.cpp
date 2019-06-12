@@ -17,7 +17,14 @@ Angle angle(const NodePtr a, const NodePtr b, const NodePtr c) {
   double y1 = c->getY() - b->getY();
   double x2 = a->getX() - b->getX();
   double y2 = a->getY() - b->getY();
-  return acos((x1 * x2 + y1 * y1) / norm(x1, y1) * norm(x2, y2));
+  // TODO fix, this sometimes returns a value larger than 1
+  double arg = (x1 * x2 + y1 * y1) / (norm(x1, y1) * norm(x2, y2));
+  LOGNode(arg);
+  double angle = acos(arg);
+  bool less_than_ten_degrees = angle * 180.0 / M_PI < 10;
+  LOGNode(angle);
+
+  return {angle, less_than_ten_degrees};
 }
 
 ///////////////////////////////////////////////////////////////////////////////

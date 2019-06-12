@@ -6,11 +6,18 @@
 #include <memory>
 #include <vector>
 
+#define DEBUG_NODE 1
+#if DEBUG_NODE == 1
+#include <iostream>
+#define LOGNode(x) std::cerr << x << std::endl;
+#else
+#define LOGNode(x)
+#endif
+
 class Node;
 class DistanceResult;
 
 using NodePtr = std::shared_ptr<Node>;
-using Angle = double;
 
 class Node {
 
@@ -53,8 +60,7 @@ private:
 
 double calculateDistanceBetweenNodes(const NodePtr a, const NodePtr b);
 
-class DistanceResult {
-public:
+struct DistanceResult {
   //! Default constructor
   DistanceResult();
 
@@ -65,6 +71,15 @@ public:
 
   bool valid;
   double distance;
+};
+
+struct Angle {
+public:
+  Angle() : Angle(0.0, true) {}
+  Angle(const double a, const bool s) : angle(a), isStraight(s) {}
+  virtual ~Angle() {}
+  double angle;
+  bool isStraight;
 };
 
 Angle angle(const NodePtr a, const NodePtr b, const NodePtr c);
