@@ -1,7 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG == 1
 #define LOG(x) std::cerr << x << std::endl;
@@ -20,9 +20,9 @@
 
 using NodeIndex = unsigned int;
 using IndexedNode = std::pair<NodeIndex, NodePtr>;
-using NodeWithAngle = std::pair<NodeIndex, Angle>;
 class Distance;
 struct DNodeContainer;
+struct NodeWithAngle;
 
 class Graph {
 public:
@@ -99,6 +99,16 @@ struct DNodeContainer {
   std::map<NodeIndex, Distance> distances;
   std::map<NodeIndex, IndexedNode> predecessors;
   std::map<NodeIndex, bool> visited;
+};
+
+struct NodeWithAngle {
+  NodeWithAngle() : NodeWithAngle(0.0, Angle()) {}
+  NodeWithAngle(const NodeIndex i, const Angle &a) : idx(i), angle(a) {}
+  NodeWithAngle(const NodeIndex i, const double a, const bool s)
+      : idx(i), angle(a, s) {}
+  virtual ~NodeWithAngle() {}
+  NodeIndex idx;
+  Angle angle;
 };
 
 #endif // GRAPH_H
