@@ -12,17 +12,21 @@ double euclid(const double x1, const double y1, const double x2,
 double norm(const double x1, const double y1);
 double norm(const double x1, const double y1) { return euclid(x1, y1, 0, 0); }
 
+constexpr double dot(const double x1, const double x2, const double y1,
+                     const double y2);
+constexpr double dot(const double x1, const double x2, const double y1,
+                     const double y2) {
+  return (x1 * x2 + y1 * y2);
+}
+
 Angle angle(const NodePtr a, const NodePtr b, const NodePtr c) {
   double x1 = c->getX() - b->getX();
   double y1 = c->getY() - b->getY();
-  double x2 = a->getX() - b->getX();
-  double y2 = a->getY() - b->getY();
-  // TODO fix, this sometimes returns a value larger than 1
-  double arg = (x1 * x2 + y1 * y1) / (norm(x1, y1) * norm(x2, y2));
-  LOGNode(arg);
+  double x2 = b->getX() - a->getX();
+  double y2 = b->getY() - a->getY();
+  double arg = dot(x1, x2, y1, y2) / (norm(x1, y1) * norm(x2, y2));
   double angle = acos(arg);
   bool less_than_ten_degrees = angle * 180.0 / M_PI < 10;
-  LOGNode(angle);
 
   return {angle, less_than_ten_degrees};
 }
@@ -72,6 +76,11 @@ Node &Node::addNeighbour(const NodePtr other) {
       calculateDistanceBetweenNodes(std::make_shared<Node>(*this), other);
   _cachedDistancesToNeighbours.insert(std::make_pair(other, dist));
   return *this;
+}
+
+std::ostream &operator<<(std::ostream &os, const NodePtr a) {
+  os << a->getX() << " , " << a->getY();
+  return os;
 }
 
 DistanceResult Node::getDistancetoNeighbour(const NodePtr other) {

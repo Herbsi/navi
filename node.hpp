@@ -58,6 +58,8 @@ private:
   std::map<NodePtr, double> _cachedDistancesToNeighbours;
 };
 
+std::ostream &operator<<(std::ostream &os, const NodePtr n);
+
 double calculateDistanceBetweenNodes(const NodePtr a, const NodePtr b);
 
 struct DistanceResult {

@@ -1,5 +1,5 @@
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef GRAPH_HPP
+#define GRAPH_HPP
 
 #define DEBUG 0
 
@@ -73,6 +73,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 //                                  DISTANCE                                 //
 ///////////////////////////////////////////////////////////////////////////////
+
 class Distance {
 public:
   //! Default Constructor
@@ -113,4 +114,4 @@ struct NodeWithAngle {
   Angle angle;
 };
 
-#endif // GRAPH_H
+#endif // GRAPH_HPP
