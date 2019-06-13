@@ -45,7 +45,10 @@ constexpr double dot(const double x1, const double x2, const double y1,
 
 /**
  * \brief           Calculate euclidian distance between nodes
- * \param[in]       param
+ *
+ * \param[in]       a First node
+ * \param[in]       b Second node
+ *
  * \return          return type
  */
 double calculateDistanceBetweenNodes(const NodePtr &a, const NodePtr &b);

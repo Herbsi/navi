@@ -28,10 +28,9 @@ public:
 
   //! Parameter constructor
   //
-  //! \detail Throws std::runtime_error if filename could not be read and prints
-  //! to std::cerr
-  //! Throws std::out_of_range if there's a connection to or from a node that
-  //! does not exist
+  //! \details Throws std::runtime_error if filename could not be read and
+  //! prints to std::cerr Throws std::out_of_range if there's a connection to or
+  //! from a node that does not exist
   //
   //! \param[in] filename Input file, certain format expected
   Graph(const std::string &filename);
@@ -59,7 +58,7 @@ public:
   /**
    * \brief Euclidean distance between node at index i and node at index j
    *
-   * \detail Throws std::out_of_range if i or j are invalid indices and prints
+   * \details Throws std::out_of_range if i or j are invalid indices and prints
    * to std::cerr
    *
    * \param[in] i First node index
@@ -72,7 +71,7 @@ public:
   /**
    * \brief           Total path length of nodes in passed vector
    *
-   * \detail          Throws std::out_of_range if a node index in path was
+   * \details          Throws std::out_of_range if a node index in path was
    * invalid and prints error message to std::cerr \param[in]       path Vector
    * of node indices
    *
@@ -84,7 +83,7 @@ public:
   /**
    * \brief           Finds shortest path between i & j in Graph
    *
-   * \detail          Uses Dijkstra algorithm
+   * \details          Uses Dijkstra algorithm
    *
    *
    * \warning         There is a path from i to j
@@ -97,7 +96,7 @@ public:
    * \brief           Finds shortest path between i & j in Graph and adds angle
    * information to each node
    *
-   * \detail          The angle for i and j will always be zero
+   * \details          The angle for i and j will always be zero
    *
    * \param[in]       i Start point
    * \param[in]       j End point
@@ -118,8 +117,8 @@ private:
    * \brief           Helper function for calculating edgeLength, uses my
    * DistanceResult class
    *
-   * \detail          Throws std::out_of_range and prints to std::cerr if i or j
-   * are invalid indices
+   * \details          Throws std::out_of_range and prints to std::cerr if i or
+   * j are invalid indices
    *
    * \param[in]       i First Node
    * \param[in]       j Second Node
@@ -153,7 +152,7 @@ private:
    * \brief           Builds a path backwards from endpoint
    *
    * \param[in]       endpoint Nomen est omen
-   * \param[in]       predecessors map from NodeIndex to its predecessor in
+   * \param[in]       predecessor  map from NodeIndex to its predecessor in
    * finale path
    *
    * \return          Returns path in correct order, so path[0] is start point
@@ -164,7 +163,7 @@ private:
   /**
    * \brief           Addes angle information at every node in path
    *
-   * \detail          Start and end point will have angle zero
+   * \details          Start and end point will have angle zero
    *
    * \param[in]       path Path whose angles are to be determined
    *
@@ -213,7 +212,7 @@ bool operator<(const Distance &a, const Distance &b);
 /**
  * \brief           + Operator for Distance class
  *
- * \detail          inf + a == a + inf == inf
+ * \details          inf + a == a + inf == inf
  *
  * \param[in]       lhs left side
  * \param[in]       rhs right side
