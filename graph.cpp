@@ -184,7 +184,7 @@ Graph::_builtPathWithAngle(const std::vector<NodeIndex> &path) {
     LOGNode(*it);
     pathWithAngle.emplace_back(*it, angle(prevNode, currentNode, nextNode));
   }
-  pathWithAngle.emplace_back(*path.end(), Angle(0.0, true));
+  pathWithAngle.emplace_back(*(path.end() - 1), Angle(0.0, true));
   return pathWithAngle;
 }
 
