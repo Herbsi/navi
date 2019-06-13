@@ -1,3 +1,6 @@
+/**
+ * Provides Node class to use in Graphs
+ */
 #ifndef NODE_HPP
 #define NODE_HPP
 
@@ -6,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-#define DEBUG_NODE 1
+#define DEBUG_NODE 0
 #if DEBUG_NODE == 1
 #include <iostream>
 #define LOGNode(x) std::cerr << x << std::endl;
@@ -25,14 +28,21 @@ public:
   //! Default constructor
   Node();
 
+  //! Parameter constructor
+  //
+  //! \param[in] x x Coordinate
+  //! \param[in] y y Coordinate
   Node(const double x, const double y);
-  Node(const double x, const double y, const std::vector<NodePtr> neighbours);
+
+  //! Parameter constructor
+  //
+  //! \param[in] x x Coordinate
+  //! \param[in] y y Coordinate
+  //! \param[in] neighbours vector of neighbours
+  Node(const double x, const double y, const std::vector<NodePtr> &neighbours);
 
   //! Copy constructor
   Node(const Node &other);
-
-  //! Move constructor
-  Node(Node &&other) noexcept = delete;
 
   //! Destructor
   virtual ~Node() noexcept;
@@ -40,50 +50,94 @@ public:
   //! Copy assignment operator
   Node &operator=(const Node &other);
 
-  //! Move assignment operator
-  Node &operator=(Node &&other) noexcept;
-
+  //! Getter for x coordinate
   double getX() const { return _x; }
+
+  //! Getter for y coordinate
   double getY() const { return _y; }
+
+  //! Getter for neighbours
   std::vector<NodePtr> neighbours() const { return _neighbours; }
 
-  Node &addNeighbour(const NodePtr other);
-  DistanceResult getDistancetoNeighbour(const NodePtr other);
+  /**
+   * \brief           Addes other as neighbour to Node
+   *
+   *  \param[in]       other Node to be added as neighbour
+   *
+   *  \return          this
+   */
+  Node &addNeighbour(const NodePtr &other);
+
+  /**
+   * \brief           getsDistance to Neighbour
+   *
+   * \param[in]       other Neighbour
+   *
+   * \return          DistanceResult, member 'valid' is false if other is not
+   * actually a neighbour
+   */
+  DistanceResult getDistancetoNeighbour(const NodePtr &other);
 
 protected:
 private:
-  double _x;
-  double _y;
-  std::vector<NodePtr> _neighbours;
-  std::map<NodePtr, double> _cachedDistancesToNeighbours;
+  double _x;                        //!< x coordinate
+  double _y;                        //!< y coordinate
+  std::vector<NodePtr> _neighbours; //!< vector with all neighbours
+  std::map<NodePtr, double>
+      _cachedDistancesToNeighbours; //!< vector with all distances to neighbours
+                                    //!< cached, so they only have to be
+                                    //!< computed once
 };
-
-std::ostream &operator<<(std::ostream &os, const NodePtr n);
-
-double calculateDistanceBetweenNodes(const NodePtr a, const NodePtr b);
 
 struct DistanceResult {
   //! Default constructor
-  DistanceResult();
+  DistanceResult() : DistanceResult(true, 0.0) {}
 
+  //! Parameter constructor
+  //
+  //! \param[in] validResult true if result is valid
+  //! \param[in] result actual result value
   DistanceResult(const bool validResult, const double result)
       : valid(validResult), distance(result) {}
 
+  //! Destructor
   virtual ~DistanceResult() noexcept {}
 
-  bool valid;
-  double distance;
+  bool valid;      //!< nomen est omen
+  double distance; //!< nomen est omen
 };
 
 struct Angle {
 public:
+  //! Default constructor
   Angle() : Angle(0.0, true) {}
-  Angle(const double a, const bool s) : angle(a), isStraight(s) {}
+
+  //! Parameter constructor
+  //
+  //! \param[in] angle_rad Angle in radiant
+  //! \param[in] straight true if angle_rad is considered straight
+  Angle(const double angle_rad, const bool straight)
+      : angle(angle_rad), isStraight(straight) {}
+
+  //! Destructor
   virtual ~Angle() {}
-  double angle;
-  bool isStraight;
+
+  double angle;    //!< angle value in radiant
+  bool isStraight; //!< Nomen est omen
 };
 
-Angle angle(const NodePtr a, const NodePtr b, const NodePtr c);
+/**
+ * \brief           Calculates angle at node b, so angle between vec(b-a) and
+ * vec(c-b)
+ *
+ * \param[in]       a First Node
+ * \param[in]       b Second Node
+ * \param[in]       c Third Node
+ *
+ * \warning         Does not check whether a, b & c are actually neighbours
+ * \return          Angle object, isStraight == true if angle is less than 10
+ * degrees
+ */
+Angle angle(const NodePtr &a, const NodePtr &b, const NodePtr &c);
 
 #endif /* NODE_HPP */

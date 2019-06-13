@@ -4,7 +4,7 @@
 //                                   GRAPH                                    //
 ///////////////////////////////////////////////////////////////////////////////
 
-Graph::Graph() : _nodes({{}}) {}
+Graph::Graph() : _nodes({{}}), _neighbours({{}}) {}
 
 Graph::Graph(const std::string &filename) {
   std::ifstream infile;
@@ -34,45 +34,42 @@ Graph::Graph(const std::string &filename) {
   }
 }
 
-Graph::~Graph() noexcept {}
-
-Graph &Graph::operator=(const Graph &rhs) {
-  // Check for self-assignment!
-  if (this == &rhs)
-    return *this;
-  for (auto &pair : rhs._nodes) {
-    // deep copy Node
-    NodePtr n = std::make_shared<Node>(*(pair.second));
-  }
-
-  return *this;
-}
-
 DistanceResult Graph::_edgeLength(const NodeIndex i, const NodeIndex j) {
-  return _nodes.at(i)->getDistancetoNeighbour(_nodes.at(j));
+  try {
+    return _nodes.at(i)->getDistancetoNeighbour(_nodes.at(j));
+  } catch (std::out_of_range &) {
+    std::cerr << "Invalid indices (at least 1): " << i << " " << j << std::endl;
+    throw;
+  }
 }
 
 double Graph::edgeLength(const NodeIndex i, const NodeIndex j) {
   return _edgeLength(i, j).distance;
 }
 
-double Graph::pathLength(const std::vector<NodeIndex> &path) {
+double Graph::pathLength(const Path &path) {
   DistanceResult pathLengthResult(true, 0.0);
   for (auto it = path.begin(); it != path.end() - 1; ++it) {
-    DistanceResult dr =
-        _nodes.at(*it)->getDistancetoNeighbour(_nodes.at(*(it + 1)));
-    if (!dr.valid) {
-      pathLengthResult.valid = false;
-      pathLengthResult.distance = -1;
-    }
-    if (pathLengthResult.valid) {
-      pathLengthResult.distance += dr.distance;
+    try {
+      DistanceResult dr =
+          _nodes.at(*it)->getDistancetoNeighbour(_nodes.at(*(it + 1)));
+      if (!dr.valid) {
+        pathLengthResult.valid =
+            false; // if any edge was invalid, stop adding to total distance
+        pathLengthResult.distance = -1;
+      }
+      if (pathLengthResult.valid) {
+        pathLengthResult.distance += dr.distance;
+      }
+    } catch (std::out_of_range &) {
+      std::cerr << "Invalid node " << *it << std::endl;
+      throw;
     }
   }
   return pathLengthResult.distance;
 }
 
-std::vector<NodeIndex> Graph::navi(const NodeIndex i, const NodeIndex j) {
+Path Graph::navi(const NodeIndex i, const NodeIndex j) {
 
   DNodeContainer dnc = _initialise(i);
   _dijkstra(dnc);
