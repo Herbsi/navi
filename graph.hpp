@@ -4,14 +4,6 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
-#define DEBUG 0
-
-#if DEBUG == 1
-#define LOG(x) std::cerr << x << std::endl;
-#else
-#define LOG(x)
-#endif
-
 #include "node.hpp"
 #include <algorithm>
 #include <cassert>
@@ -38,6 +30,8 @@ public:
   //
   //! \detail Throws std::runtime_error if filename could not be read and prints
   //! to std::cerr
+  //! Throws std::out_of_range if there's a connection to or from a node that
+  //! does not exist
   //
   //! \param[in] filename Input file, certain format expected
   Graph(const std::string &filename);

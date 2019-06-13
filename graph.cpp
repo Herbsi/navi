@@ -10,8 +10,7 @@ Graph::Graph(const std::string &filename) {
   std::ifstream infile;
   infile.open(filename);
   if (infile.is_open()) {
-    // ignore NODES: line
-    infile.ignore(256, '\n');
+    infile.ignore(256, '\n'); // ignore NODES: line
     NodeIndex idx;
     double x, y;
     while (infile >> idx >> x >> y) {
@@ -20,14 +19,20 @@ Graph::Graph(const std::string &filename) {
       _neighbours.insert(std::make_pair(idx, std::vector<NodeIndex>({})));
     }
     infile.clear();
-    // skip EDGES: line
-    infile.ignore(256, '\n');
+
+    infile.ignore(256, '\n'); // skip EDGES: line
     NodeIndex a, b;
     while (infile >> a >> b) {
-      _nodes.at(a)->addNeighbour(_nodes.at(b));
-      _nodes.at(b)->addNeighbour(_nodes.at(a));
-      _neighbours.at(a).push_back(b);
-      _neighbours.at(b).push_back(a);
+      try {
+        _nodes.at(a)->addNeighbour(_nodes.at(b));
+        _nodes.at(b)->addNeighbour(_nodes.at(a));
+        _neighbours.at(a).push_back(b);
+        _neighbours.at(b).push_back(a);
+      } catch (std::out_of_range &) {
+        std::cerr << "Invalid node index (at least 1): " << a << " " << b
+                  << std::endl;
+        throw;
+      }
     }
   } else {
     throw std::runtime_error("Could not read " + filename + "\n");
@@ -49,9 +54,9 @@ double Graph::edgeLength(const NodeIndex i, const NodeIndex j) {
 
 double Graph::pathLength(const Path &path) {
   DistanceResult pathLengthResult(true, 0.0);
-  for (auto it = path.begin(); it != path.end() - 1; ++it) {
+  for (auto it = path.cbegin(); it != path.cend() - 1; ++it) {
     try {
-      DistanceResult dr =
+      const DistanceResult dr =
           _nodes.at(*it)->getDistancetoNeighbour(_nodes.at(*(it + 1)));
       if (!dr.valid) {
         pathLengthResult.valid =
@@ -87,7 +92,7 @@ DNodeContainer Graph::_initialise(const NodeIndex i) {
   std::map<NodeIndex, IndexedNode> predecessors;
   std::map<NodeIndex, bool> visited;
 
-  for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
+  for (auto it = _nodes.cbegin(); it != _nodes.cend(); ++it) {
     NodeIndex idx = it->first;
     NodePtr currentNode = it->second;
     distances.emplace(std::make_pair(idx, Distance(0.0, true)));
@@ -102,25 +107,16 @@ DNodeContainer Graph::_initialise(const NodeIndex i) {
 
 Graph &Graph::_dijkstra(DNodeContainer &dnc) {
 
+  // while not all nodes have been visited
   while (!std::all_of(dnc.visited.begin(), dnc.visited.end(),
                       [](auto &v) { return v.second; })) {
 
-    LOG("Start of while ");
-#if DEBUG == 1
-    std::for_each(std::begin(dnc.distances), std::end(dnc.distances),
-                  [](auto &a) {
-                    std::cerr << a.first << " " << a.second.distance << " "
-                              << a.second.isInf << "\n";
-                  });
-#endif
-
-    LOG("Finding minimum");
+    // get element that is currently the least distance away from start point
     auto u = std::min_element(dnc.distances.begin(), dnc.distances.end(),
                               [](const auto &a, const auto &b) {
                                 return a.second < b.second;
                               }); // use < Operator for Distance class
-    LOG("Found minimum ");
-    LOG(u->first);
+
     if (u != dnc.distances.end()) {
       NodeIndex u_idx = u->first;
       dnc.visited.at(u_idx) = true;
@@ -139,13 +135,10 @@ Graph &Graph::_dijkstra(DNodeContainer &dnc) {
         }
       }
       dnc.distances.erase(u);
-      LOG("End of for");
+
     } else
-      std::cerr << "Invalid minimum\n";
-    LOG("End of while\n");
+      std::cerr << "Invalid minimum" << std::endl;
   }
-  LOG("Finished Dijkstra");
-  // Dijkstra is done
 
   return *this;
 }
@@ -155,15 +148,16 @@ Graph::_builtPath(const NodeIndex endpoint,
                   const std::map<NodeIndex, IndexedNode> &predecessors) {
 
   std::vector<NodeIndex> path = {endpoint};
+  path.reserve(predecessors.size() - 1);
   auto u = predecessors.at(endpoint);
-  path.push_back(u.first);
+  path.emplace_back(u.first);
+  // start point is determined by not having a valid predecessor pointer
   while (predecessors.at(u.first).second != nullptr) {
     u = predecessors.at(u.first);
-    path.push_back(u.first);
+    path.emplace_back(u.first);
   }
 
   std::reverse(std::begin(path), std::end(path));
-  LOG("Built path");
 
   return path;
 }
@@ -178,7 +172,6 @@ Graph::_builtPathWithAngle(const std::vector<NodeIndex> &path) {
     auto prevNode = _nodes.at(*(it - 1));
     auto currentNode = _nodes.at(*it);
     auto nextNode = _nodes.at(*(it + 1));
-    LOGNode(*it);
     pathWithAngle.emplace_back(*it, angle(prevNode, currentNode, nextNode));
   }
   pathWithAngle.emplace_back(*(path.end() - 1), Angle(0.0, true));
@@ -192,9 +185,7 @@ Graph::_builtPathWithAngle(const std::vector<NodeIndex> &path) {
 bool operator<(const Distance &a, const Distance &b) {
   bool res = true;
   if (!a.isInf && !b.isInf) {
-    LOG(a.distance);
-    LOG(b.distance);
-    LOG("");
+
     res = a.distance < b.distance;
   } else if (!a.isInf && b.isInf) {
     res = true;

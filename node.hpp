@@ -9,14 +9,6 @@
 #include <memory>
 #include <vector>
 
-#define DEBUG_NODE 0
-#if DEBUG_NODE == 1
-#include <iostream>
-#define LOGNode(x) std::cerr << x << std::endl;
-#else
-#define LOGNode(x)
-#endif
-
 class Node;
 class DistanceResult;
 
