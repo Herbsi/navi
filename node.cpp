@@ -74,13 +74,15 @@ Angle angle(const NodePtr &a, const NodePtr &b, const NodePtr &c) {
 //                                    CONSTRUCTORS //
 ///////////////////////////////////////////////////////////////////////////////
 
-Node::Node() : Node(0, 0, {}) {}
+Node::Node() : Node(0, 0, {}, {{}}) {}
 
-Node::Node(const double x, const double y) : Node(x, y, {}) {}
+Node::Node(const double x, const double y) : Node(x, y, {}, {{}}) {}
 
 Node::Node(const double x, const double y,
-           const std::vector<NodePtr> &neighbours)
-    : _x(x), _y(y), _neighbours(neighbours) {
+           const std::vector<NodePtr> &neighbours,
+           const std::map<NodePtr, double> &cachedDistancesToNeighbours)
+    : _x(x), _y(y), _neighbours(neighbours),
+      _cachedDistancesToNeighbours(cachedDistancesToNeighbours) {
 
   // cache distances to neighbours
   for (auto &n : _neighbours) {

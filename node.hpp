@@ -31,7 +31,8 @@ public:
   //! \param[in] x x Coordinate
   //! \param[in] y y Coordinate
   //! \param[in] neighbours vector of neighbours
-  Node(const double x, const double y, const std::vector<NodePtr> &neighbours);
+  Node(const double x, const double y, const std::vector<NodePtr> &neighbours,
+       const std::map<NodePtr, double> &cachedDistancesToNeighbours);
 
   //! Copy constructor
   Node(const Node &other);
