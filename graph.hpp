@@ -250,9 +250,11 @@ struct NodeWithAngle {
   //! \param[in] i Node index
   //! \param[in] angle_rad angle in rad
   //! \param[in] isStraight bool if angle_rad is straight or not
+  //! \param[in] positiveDir true if turn direction is positive in mathematical
+  //! sense
   NodeWithAngle(const NodeIndex i, const double angle_rad,
-                const bool isStraight)
-      : idx(i), angle(angle_rad, isStraight) {}
+                const bool isStraight, const bool positiveDir)
+      : idx(i), angle(angle_rad, isStraight, positiveDir) {}
 
   //! Destructor
   virtual ~NodeWithAngle() {}

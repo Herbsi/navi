@@ -6,7 +6,7 @@
 
 Graph::Graph() : _nodes({{}}), _neighbours({{}}) {}
 
-Graph::Graph(const std::string &filename) : _nodes({{}}), _neighbours({{}}) {
+Graph::Graph(const std::string &filename) {
   std::ifstream infile;
   infile.open(filename);
   if (infile.is_open()) {
@@ -167,14 +167,14 @@ Graph::_builtPathWithAngle(const std::vector<NodeIndex> &path) {
 
   std::vector<NodeWithAngle> pathWithAngle;
   pathWithAngle.reserve(path.size());
-  pathWithAngle.emplace_back(*path.begin(), Angle(0.0, true));
+  pathWithAngle.emplace_back(*path.begin(), Angle(0.0, true, true));
   for (auto it = path.begin() + 1; it != path.end() - 1; ++it) {
     auto prevNode = _nodes.at(*(it - 1));
     auto currentNode = _nodes.at(*it);
     auto nextNode = _nodes.at(*(it + 1));
     pathWithAngle.emplace_back(*it, angle(prevNode, currentNode, nextNode));
   }
-  pathWithAngle.emplace_back(*(path.end() - 1), Angle(0.0, true));
+  pathWithAngle.emplace_back(*(path.end() - 1), Angle(0.0, true, true));
   return pathWithAngle;
 }
 

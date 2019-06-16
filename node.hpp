@@ -103,20 +103,24 @@ struct DistanceResult {
 struct Angle {
 public:
   //! Default constructor
-  Angle() : Angle(0.0, true) {}
+  Angle() : Angle(0.0, true, true) {}
 
   //! Parameter constructor
   //
   //! \param[in] angle_rad Angle in radiant
   //! \param[in] straight true if angle_rad is considered straight
-  Angle(const double angle_rad, const bool straight)
-      : angle(angle_rad), isStraight(straight) {}
+  //! \param[in] positiveDir true if turn direction is positive in mathematical
+  //! sense
+  Angle(const double angle_rad, const bool straight, const bool positiveDir)
+      : angle(angle_rad), isStraight(straight), turnsPositive(positiveDir) {}
 
   //! Destructor
   virtual ~Angle() {}
 
-  double angle;    //!< angle value in radiant
-  bool isStraight; //!< Nomen est omen
+  double angle;       //!< angle value in radiant
+  bool isStraight;    //!< Nomen est omen
+  bool turnsPositive; //!< True if Angle denotes a turn in mathematical positive
+                      //!< direction
 };
 
 /**
