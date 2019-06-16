@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -262,5 +263,7 @@ struct NodeWithAngle {
   NodeIndex idx; //!< Index of Node
   Angle angle;   //!< Angle at node, depends on where you are coming from
 };
+
+std::ostream &operator<<(std::ostream &os, const NodeWithAngle &n);
 
 #endif // GRAPH_HPP

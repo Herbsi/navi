@@ -206,3 +206,19 @@ Distance operator+(const Distance &lhs, const Distance &rhs) {
   }
   return result;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//                               NodeWithAngle                               //
+///////////////////////////////////////////////////////////////////////////////
+
+std::ostream &operator<<(std::ostream &os, const NodeWithAngle &n) {
+  os << std::setw(3) << n.idx << " angle: " << std::setw(8)
+     << (n.angle.isStraight ? 0.0 : n.angle.angle * 180.0 / M_PI)
+     // mathematical positive turn direction is counterclockwise
+     // so turning 90 degrees in positive direction means going 90
+     // degrees to the right
+     << "\t" << (n.angle.isStraight ? "keep " : "turn ") << std::setw(10)
+     << (n.angle.isStraight ? "straight"
+                            : (n.angle.turnsPositive ? "right" : "left"));
+  return os;
+}
