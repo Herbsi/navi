@@ -6,7 +6,7 @@
 
 Graph::Graph() : _nodes({{}}), _neighbours({{}}) {}
 
-Graph::Graph(const std::string &filename) {
+Graph::Graph(const std::string &filename) : _nodes({}), _neighbours({{}}) {
   std::ifstream infile;
   infile.open(filename);
   if (infile.is_open()) {
