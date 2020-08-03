@@ -1,15 +1,13 @@
-CXX=g++-9
-CPPFLAGS= -Wall -Wextra -pedantic -Wswitch-default -Wmissing-declarations -Wfloat-equal -Wundef -Wredundant-decls
--Wuninitialized -Winit-self -Wnon-virtual-dtor -Weffc++ -Wshadow -Wparentheses -Wunreachable-code -Wfatal-errors -std=c++14
+CXX=g++
+CPPFLAGS= -Wall -Wextra -std=c++17
 
 SRCS=main.cpp graph.hpp graph.cpp node.hpp node.cpp
-OBJECTS=bsp_30
 
 bsp_30: $(SRCS)
-	$(CXX) $(CPPFLAGS) -o bsp_30 $(SRCS)
+	$(CXX) -c $(SRCS) $(CPPFLAGS)
 
 debug: $(SRCS)
-	$(CXX) $(CPPFLAGS) -g -o bsp_30 $(SRCS)
+	$(CXX) -c $(SRCS) $(CPPFLAGS) -g
 
 clean: $(OBJECTS)
 	rm $(OBJECTS)
